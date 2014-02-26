@@ -1,0 +1,47 @@
+
+public class TestMain4 {
+
+	public static void main(String[] args) throws IOException,
+			InterruptedException {
+		System.out.println("running");
+		Thread.sleep(10000);
+		setAppProperty();
+		final AbstractApplicationContext context = new ClassPathXmlApplicationContext(
+				"classpath:META-INF/spring/integration/file-null-writer.xml");
+		ConfigurableEnvironment env = context.getEnvironment();
+		TestService test = (TestService)context.getBean("testService");
+		test.testService();
+}
+
+	public static void setAppProperty() throws IOException {
+		
+		
+		Properties mainProperties = new Properties();
+		//mainProperties.setProperty("com.madlabs.watchman", "D:/WorkSpace/EXE-TEST-ENV/setting.properties");
+		
+		FileInputStream file = null;
+		String path = "./setting.properties";
+		//String path ="D:/WorkSpace/EXE-TEST-ENV/setting.properties";
+		 
+		//System.setProperty("com.madlabs.watchman", "D:/WorkSpace/EXE-TEST-ENV/setting.properties");
+		
+		file = new FileInputStream(path);
+		mainProperties.load(file);
+		file.close();
+		Enumeration<String> keyList = (Enumeration<String>) mainProperties.propertyNames();
+		
+		//Enumeration<String> keyList = (Enumeration<String>) System.getProperties().propertyNames();
+		while (keyList.hasMoreElements()) {
+			String key = keyList.nextElement();
+			String value = mainProperties.getProperty(key);
+			System.setProperty(key, value);
+			System.out.println(key +":"+value);
+		}
+		//System.setProperties(mainProperties);
+	}
+}
+
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+		<property name="location" value="file:${com.madlabs.watchman}"></property>
+	</bean> 
