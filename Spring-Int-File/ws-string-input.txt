@@ -1,0 +1,28 @@
+public class TicketWebServiceDomClient {
+	private static String bodyTemplate = "<TicketRequest xmlns=\""
+			+ CommonConfiguration.NAMESPACE + "\">"
+			+ "<description>%s</description>" + "<priority>%s</priority>"
+			+ "</TicketRequest>";
+
+	public static void main(String[] args) throws Exception {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+				"client.xml");
+		MessageChannel channel = context.getBean("ticketRequests",
+				MessageChannel.class);
+		String body = String.format(bodyTemplate, "Message Broker Down",
+				"emergency");
+		System.out.println(body);
+		MessagingTemplate messagingTemplate = new MessagingTemplate();
+		Message<?> message = messagingTemplate.sendAndReceive(channel,
+				MessageBuilder.withPayload(body).build());
+		System.out.println(message.getPayload());
+	}
+}
+
+
+Bean Configurations to receive
+
+<int:channel id="ticketRequests"/>
+<ws:outbound-gateway id="ticketIssueGateway" request-channel="ticketRequests"
+uri="http://${ws.host}:${ws.port}/${ws.context}/ticketservice/􀀁
+tickets"/>
